@@ -13,4 +13,13 @@ fn main() {
 
     let part1 = input.windows(2).filter(|s| s[0] < s[1]).count();
     dbg!(part1);
+
+    let part2 = input
+        .windows(3)
+        .map(|s| s.iter().sum())
+        .collect::<Vec<i64>>()
+        .windows(2)
+        .filter(|s| s[0] < s[1])
+        .count();
+    dbg!(part2);
 }
