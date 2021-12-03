@@ -1,3 +1,5 @@
+pub use prelude_2020::*;
+
 #[cfg(test)]
 mod tests {
     #[test]
