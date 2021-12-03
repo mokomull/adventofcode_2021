@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use prelude::*;
 
-fn compare_ones_to_zeroes<'a>(input: &[&'a [u8]], bit_position: usize) -> Ordering {
+fn compare_ones_to_zeroes(input: &[&[u8]], bit_position: usize) -> Ordering {
     let ones = input.iter().filter(|&s| s[bit_position] == b'1').count();
     let zeroes = input.len() - ones;
 
