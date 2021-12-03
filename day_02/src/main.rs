@@ -25,7 +25,7 @@ fn main() {
     let mut x = 0;
     let mut y = 0;
 
-    for i in input {
+    for i in &input {
         match i {
             Forward(dx) => x += dx,
             Up(dy) => y -= dy,
@@ -35,4 +35,22 @@ fn main() {
 
     let part1 = x * y;
     dbg!(part1);
+
+    let mut x = 0;
+    let mut y = 0;
+    let mut aim = 0;
+
+    for i in &input {
+        match i {
+            Forward(dx) => {
+                x += dx;
+                y += aim * dx;
+            }
+            Down(dy) => aim += dy,
+            Up(dy) => aim -= dy,
+        }
+    }
+
+    let part2 = x * y;
+    dbg!(part2);
 }
