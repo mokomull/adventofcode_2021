@@ -9,8 +9,8 @@ fn compare_ones_to_zeroes(input: &[&[u8]], bit_position: usize) -> Ordering {
     ones.cmp(&zeroes)
 }
 
-fn main() {
-    let input = read_lines_from_file("inputs/day_03.txt").collect::<Vec<_>>();
+fn do_main(input: &str) {
+    let input = read_lines_from_file(input).collect::<Vec<_>>();
     let input: Vec<_> = input.iter().map(|s| s.as_bytes()).collect();
 
     let mut gamma = String::new();
@@ -33,6 +33,7 @@ fn main() {
 
     let part1 = gamma * epsilon;
     dbg!(part1);
+    assert_eq!(part1, 3148794);
 
     let mut oxygen_candidates = input.clone();
     let mut co2_candidates = input.clone();
@@ -69,4 +70,17 @@ fn main() {
         .expect("can't parse co2");
     let part2 = oxygen * co2;
     dbg!(part2);
+    assert_eq!(part2, 2795310);
+}
+
+fn main() {
+    do_main("inputs/day_03.txt");
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn main() {
+        super::do_main("../inputs/day_03.txt");
+    }
 }

@@ -1,7 +1,7 @@
 use std::io::BufRead;
 
-fn main() {
-    let input = std::fs::File::open("inputs/day_01.txt").expect("could not open input");
+fn do_main(input: &str) {
+    let input = std::fs::File::open(input).expect("could not open input");
     let input = std::io::BufReader::new(input)
         .lines()
         .map(|s| {
@@ -13,6 +13,7 @@ fn main() {
 
     let part1 = input.windows(2).filter(|s| s[0] < s[1]).count();
     dbg!(part1);
+    assert_eq!(part1, 1374);
 
     let part2 = input
         .windows(3)
@@ -22,4 +23,17 @@ fn main() {
         .filter(|s| s[0] < s[1])
         .count();
     dbg!(part2);
+    assert_eq!(part2, 1418);
+}
+
+fn main() {
+    do_main("inputs/day_01.txt");
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn main() {
+        super::do_main("../inputs/day_01.txt");
+    }
 }

@@ -1,7 +1,7 @@
 use prelude::*;
 
-fn main() {
-    let input = read_lines_from_file("inputs/day_04.txt").collect::<Vec<_>>();
+fn do_main(input: &str) {
+    let input = read_lines_from_file(input).collect::<Vec<_>>();
 
     let numbers = &input[0];
     let numbers = numbers
@@ -67,6 +67,7 @@ fn main() {
 
     let part1 = unmarked_sum * last_number_called;
     dbg!(part1);
+    assert_eq!(part1, 16716);
 
     let (last_winning_board, last_winning_index) = last_winner.unwrap();
     let unmarked_sum = last_winning_board
@@ -78,4 +79,17 @@ fn main() {
 
     let part2 = unmarked_sum * last_number_called;
     dbg!(part2);
+    assert_eq!(part2, 4880);
+}
+
+fn main() {
+    do_main("inputs/day_04.txt");
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn main() {
+        super::do_main("../inputs/day_04.txt");
+    }
 }
