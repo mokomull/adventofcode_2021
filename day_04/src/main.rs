@@ -10,7 +10,7 @@ fn main() {
         .collect::<Vec<_>>();
 
     let boards = input[1..]
-        .windows(6)
+        .chunks(6)
         .map(|raw| {
             raw.iter()
                 .skip(1)
