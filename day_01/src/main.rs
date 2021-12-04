@@ -1,14 +1,8 @@
-use std::io::BufRead;
+use prelude::*;
 
 fn do_main(input: &str) {
-    let input = std::fs::File::open(input).expect("could not open input");
-    let input = std::io::BufReader::new(input)
-        .lines()
-        .map(|s| {
-            s.expect("could not lines()")
-                .parse()
-                .expect("could not parse integer")
-        })
+    let input = read_lines_from_file(input)
+        .map(|s| s.parse().expect("could not parse integer"))
         .collect::<Vec<i64>>();
 
     let part1 = input.windows(2).filter(|s| s[0] < s[1]).count();
