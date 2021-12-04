@@ -26,7 +26,7 @@ fn main() {
     let mut winner = None;
     let mut count_numbers_called = None;
 
-    for count in 0..numbers.len() {
+    'found: for count in 0..numbers.len() {
         for board in &boards {
             // check rows
             let winner_by_rows = board
@@ -44,7 +44,7 @@ fn main() {
             if winner_by_rows || winner_by_columns {
                 winner = Some(board);
                 count_numbers_called = Some(count);
-                break;
+                break 'found;
             }
         }
     }
