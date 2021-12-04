@@ -1,4 +1,4 @@
-use prelude::read_lines_from_file;
+use prelude::*;
 
 fn main() {
     let input = read_lines_from_file("inputs/day_04.txt").collect::<Vec<_>>();
@@ -25,9 +25,14 @@ fn main() {
 
     let mut first_winner = None;
     let mut last_winner = None;
+    let mut has_won = HashSet::new();
 
     for count in 0..numbers.len() {
         for board in &boards {
+            if has_won.contains(board) {
+                continue;
+            }
+
             // check rows
             let winner_by_rows = board
                 .iter()
@@ -46,6 +51,7 @@ fn main() {
                     first_winner = Some((board, count))
                 }
 
+                has_won.insert(board);
                 last_winner = Some((board, count));
             }
         }
