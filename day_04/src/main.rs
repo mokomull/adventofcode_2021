@@ -1,4 +1,4 @@
-use prelude::read_lines_from_file;
+use prelude::*;
 
 fn main() {
     let input = read_lines_from_file("inputs/day_04.txt").collect::<Vec<_>>();
@@ -23,11 +23,16 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    let mut winner = None;
-    let mut count_numbers_called = None;
+    let mut first_winner = None;
+    let mut last_winner = None;
+    let mut has_won = HashSet::new();
 
-    'found: for count in 0..numbers.len() {
+    for count in 0..numbers.len() {
         for board in &boards {
+            if has_won.contains(board) {
+                continue;
+            }
+
             // check rows
             let winner_by_rows = board
                 .iter()
@@ -42,21 +47,35 @@ fn main() {
             });
 
             if winner_by_rows || winner_by_columns {
-                winner = Some(board);
-                count_numbers_called = Some(count);
-                break 'found;
+                if first_winner.is_none() {
+                    first_winner = Some((board, count))
+                }
+
+                has_won.insert(board);
+                last_winner = Some((board, count));
             }
         }
     }
 
-    let unmarked_sum = winner
-        .unwrap()
+    let (first_winning_board, first_winning_index) = first_winner.unwrap();
+    let unmarked_sum = first_winning_board
         .iter()
         .flatten()
-        .filter(|&num| !numbers[..count_numbers_called.unwrap()].contains(num))
+        .filter(|&num| !numbers[..first_winning_index].contains(num))
         .sum::<u64>();
-    let last_number_called = numbers[count_numbers_called.unwrap() - 1];
+    let last_number_called = numbers[first_winning_index - 1];
 
     let part1 = unmarked_sum * last_number_called;
     dbg!(part1);
+
+    let (last_winning_board, last_winning_index) = last_winner.unwrap();
+    let unmarked_sum = last_winning_board
+        .iter()
+        .flatten()
+        .filter(|&num| !numbers[..last_winning_index].contains(num))
+        .sum::<u64>();
+    let last_number_called = numbers[last_winning_index - 1];
+
+    let part2 = unmarked_sum * last_number_called;
+    dbg!(part2);
 }
