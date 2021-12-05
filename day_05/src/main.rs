@@ -50,7 +50,7 @@ fn do_main(input: &str) {
             let ys: Box<dyn Iterator<Item = u64>> = if righty > lefty {
                 Box::new(*lefty..=*righty)
             } else {
-                Box::new((*lefty..=*righty).rev())
+                Box::new((*righty..=*lefty).rev())
             };
 
             for (x, y) in xs.zip(ys) {
