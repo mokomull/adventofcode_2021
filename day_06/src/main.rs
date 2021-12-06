@@ -23,6 +23,24 @@ fn do_main(input: &str) {
 
     let part1 = lanternfish.len();
     dbg!(part1);
+
+    let mut timers = [0; 9];
+    for i in &input {
+        timers[*i as usize] += 1;
+    }
+
+    for _round in 0..256 {
+        let new_lanternfish = timers[0];
+
+        for i in 1..timers.len() {
+            timers[i-1] = timers[i];
+        }
+        timers[6] += new_lanternfish;
+        timers[8] = new_lanternfish;
+    }
+
+    let part2 = timers.iter().sum::<u64>();
+    dbg!(part2);
 }
 
 fn main() {
