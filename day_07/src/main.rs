@@ -26,8 +26,8 @@ fn do_main(input: &str) {
             crabs
                 .iter()
                 .map(|&crab| {
-                    let n = crab - target.abs();
-                    n * n + 1 / 2
+                    let n = (crab - target).abs();
+                    n * (n + 1) / 2
                 })
                 .sum::<i64>()
         })
