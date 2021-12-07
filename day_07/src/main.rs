@@ -20,6 +20,20 @@ fn do_main(input: &str) {
         .min_by_key(|&(_target, fuel)| fuel)
         .unwrap();
     dbg!(part1);
+
+    let part2 = (0..=*crabs.iter().max().unwrap())
+        .map(|target| {
+            crabs
+                .iter()
+                .map(|&crab| {
+                    let n = crab - target.abs();
+                    n * n + 1 / 2
+                })
+                .sum::<i64>()
+        })
+        .min()
+        .unwrap();
+    dbg!(part2);
 }
 
 fn main() {
