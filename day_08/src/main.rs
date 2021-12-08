@@ -118,6 +118,7 @@ fn do_main(input: &str) {
                 .iter()
                 .filter(|&obs| obs.len() == 6)
                 .filter(|&obs| obs != six)
+                .filter(|&obs| obs.contains(d))
                 .next()
                 .unwrap();
             let e = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
