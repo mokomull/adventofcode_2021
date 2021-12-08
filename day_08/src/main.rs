@@ -34,7 +34,6 @@ fn do_main(input: &str) {
     let part2 = input
         .iter()
         .map(|(observations, output)| {
-            dbg!(observations, output);
             // the problem statement says the signals are
             //     a
             //   b   c
@@ -126,8 +125,6 @@ fn do_main(input: &str) {
                 .filter(|&seg| !nine.contains(seg))
                 .exactly_one()
                 .unwrap();
-
-            dbg!((a, b, c, d, e, f));
 
             // five segments isn't enough to distinguish all the digits, but six oughtta be.
             // technically, having found six of them, finding G would merely be process of
