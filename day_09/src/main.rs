@@ -22,7 +22,7 @@ fn do_main(input: &str) {
                 .filter_map(identity)
                 .all(|&other| other > input[i][j])
             {
-                part1 += 1;
+                part1 += input[i][j] as u64;
             }
         }
     }
