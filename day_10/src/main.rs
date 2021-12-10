@@ -32,12 +32,12 @@ fn do_main(input: &str) {
 
         if !error {
             for c in state.into_iter().rev() {
-                part2 *= 5;
+                part2 = part2.checked_mul(5).unwrap();
                 match c {
-                    '(' => part2 += 1,
-                    '[' => part2 += 2,
-                    '{' => part2 += 3,
-                    '<' => part2 += 4,
+                    '(' => part2 = part2.checked_add(1).unwrap(),
+                    '[' => part2 = part2.checked_add(2).unwrap(),
+                    '{' => part2 = part2.checked_add(3).unwrap(),
+                    '<' => part2 = part2.checked_add(4).unwrap(),
                     _ => panic!("oops {}", c),
                 }
             }
