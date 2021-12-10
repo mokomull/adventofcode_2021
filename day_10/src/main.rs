@@ -49,7 +49,7 @@ fn do_main(input: &str) {
 
     incomplete.sort_unstable();
     assert_eq!(incomplete.len() % 2, 1);
-    let part2 = incomplete[incomplete.len() / 2 + 1];
+    let part2 = incomplete[incomplete.len() / 2];
     dbg!(part2);
 }
 
