@@ -49,6 +49,8 @@ fn do_main(input: &str) {
             dbg!(part2);
             break;
         }
+
+        do_single_step(&mut input);
     }
 }
 
