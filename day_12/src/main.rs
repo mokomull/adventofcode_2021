@@ -3,21 +3,22 @@ use prelude::*;
 type Graph = HashMap<String, Vec<String>>;
 
 fn count_paths_from_node_to_end(graph: &Graph, node: &str, visited: &HashSet<String>) -> u64 {
-    if visited.contains(node) {
-        return 0;
-    }
     if node == "end" {
         return 1;
     }
 
     let mut res = 0;
     for next in &graph[node] {
+        if visited.contains(next) {
+            continue;
+        }
+
         if node.chars().next().unwrap().is_uppercase() {
             res += count_paths_from_node_to_end(graph, next, visited);
         } else if node.chars().next().unwrap().is_lowercase() {
             let mut visited = visited.clone();
             visited.insert(node.to_owned());
-            res += count_paths_from_node_to_end(graph, node, &visited);
+            res += count_paths_from_node_to_end(graph, next, &visited);
         }
     }
     res
