@@ -14,6 +14,9 @@ fn count_paths_from_node_to_end(
 
     let mut res = 0;
     for next in &graph[node] {
+        if next == "start" {
+            continue;
+        }
         if visits.get(next).cloned().unwrap_or_default() >= max_visits_to_small {
             continue;
         }
