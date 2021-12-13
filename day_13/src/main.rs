@@ -13,14 +13,14 @@ fn fold(points: &mut HashSet<(i64, i64)>, fold: Fold) {
     for point in points.iter() {
         match fold {
             X(x) => {
-                if point.0 >= x {
-                    // x - (point - x) - 1
-                    to_add.push((2 * x - point.0 - 1, point.1));
+                if point.0 > x {
+                    // x - (point - x)
+                    to_add.push((2 * x - point.0, point.1));
                 }
             }
             Y(y) => {
-                if point.1 >= y {
-                    to_add.push((point.0, 2 * y - point.1 - 1));
+                if point.1 > y {
+                    to_add.push((point.0, 2 * y - point.1));
                 }
             }
         }
@@ -60,6 +60,10 @@ fn do_main(input: &str) {
         };
         folds.push(fold);
     }
+
+    fold(&mut points, folds[0]);
+    let part1 = points.len();
+    dbg!(part1);
 }
 
 fn main() {
