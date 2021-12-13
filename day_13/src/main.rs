@@ -64,6 +64,20 @@ fn do_main(input: &str) {
     fold(&mut points, folds[0]);
     let part1 = points.len();
     dbg!(part1);
+
+    for f in &folds[1..] {
+        fold(&mut points, *f);
+    }
+    for y in 0..=points.iter().map(|&(_, y)| y).max().unwrap() {
+        for x in 0..=points.iter().map(|&(x, _)| x).max().unwrap() {
+            if points.contains(&(x, y)) {
+                print!("#");
+            } else {
+                print!(".")
+            }
+        }
+        println!();
+    }
 }
 
 fn main() {
