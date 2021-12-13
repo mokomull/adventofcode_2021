@@ -5,8 +5,8 @@ type Graph = HashMap<String, Vec<String>>;
 fn count_paths_from_node_to_end(
     graph: &Graph,
     node: &str,
-    visits: &HashMap<String, usize>,
-    max_visits_to_small: usize,
+    visited: &HashSet<String>,
+    visited_twice: Option<&str>,
 ) -> u64 {
     if node == "end" {
         return 1;
@@ -17,16 +17,21 @@ fn count_paths_from_node_to_end(
         if next == "start" {
             continue;
         }
-        if visits.get(next).cloned().unwrap_or_default() >= max_visits_to_small {
-            continue;
-        }
 
         if node.chars().next().unwrap().is_uppercase() {
-            res += count_paths_from_node_to_end(graph, next, visits, max_visits_to_small);
+            res += count_paths_from_node_to_end(graph, next, visited, visited_twice);
         } else if node.chars().next().unwrap().is_lowercase() {
-            let mut visits = visits.clone();
-            *visits.entry(node.to_owned()).or_default() += 1;
-            res += count_paths_from_node_to_end(graph, next, &visits, max_visits_to_small);
+            match (visited.contains(node), visited_twice) {
+                (true, None) => {
+                    res += count_paths_from_node_to_end(graph, next, visited, Some(node))
+                }
+                (true, Some(_)) => continue,
+                (false, vt) => {
+                    let mut visited = visited.clone();
+                    visited.insert(node.to_owned());
+                    res += count_paths_from_node_to_end(graph, next, &visited, vt);
+                }
+            }
         }
     }
     res
@@ -44,10 +49,15 @@ fn do_main(input: &str) {
         }
     }
 
-    let part1 = count_paths_from_node_to_end(&edges, "start", &Default::default(), 1);
+    let part1 = count_paths_from_node_to_end(
+        &edges,
+        "start",
+        &Default::default(),
+        Some("don't let anything else visit twice"),
+    );
     dbg!(part1);
 
-    let part2 = count_paths_from_node_to_end(&edges, "start", &Default::default(), 2);
+    let part2 = count_paths_from_node_to_end(&edges, "start", &Default::default(), None);
     dbg!(part2);
 }
 
