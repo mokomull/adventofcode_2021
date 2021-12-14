@@ -64,6 +64,7 @@ fn do_main(input: &str) {
     fold(&mut points, folds[0]);
     let part1 = points.len();
     dbg!(part1);
+    assert_eq!(part1, 781);
 
     for f in &folds[1..] {
         fold(&mut points, *f);
@@ -82,4 +83,12 @@ fn do_main(input: &str) {
 
 fn main() {
     do_main("inputs/day_13.txt");
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn main() {
+        super::do_main("../inputs/day_13.txt");
+    }
 }
