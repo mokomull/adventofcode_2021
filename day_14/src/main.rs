@@ -19,8 +19,35 @@ fn substitute(rules: &Rules, input: String) -> String {
 
 fn do_main(input: &str) {
     let mut input = read_lines_from_file(input);
-    let template = input.next().unwrap();
+    let mut template = input.next().unwrap();
     input.next();
+    let mut rules = Rules::new();
+    for line in input {
+        let parts = line.split(" -> ").collect_vec();
+        let from = parts[0].chars().collect_vec().try_into().unwrap();
+        let to = parts[1].chars().exactly_one().unwrap();
+
+        rules.insert(from, to);
+    }
+
+    for _round in 0..10 {
+        template = substitute(&rules, template);
+    }
+    let mut elements = template.chars().collect_vec();
+    elements.sort_unstable();
+    let element_counts = elements
+        .iter()
+        .group_by(|&c| c)
+        .into_iter()
+        .map(|(&c, g)| (c, g.collect_vec().len()))
+        .collect::<HashMap<char, usize>>();
+    let (min, max) = element_counts
+        .iter()
+        .minmax_by_key(|&(_, count)| count)
+        .into_option()
+        .unwrap();
+    let part1 = max.1 - min.1;
+    dbg!(part1);
 }
 
 fn main() {
