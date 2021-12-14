@@ -17,6 +17,23 @@ fn substitute(rules: &Rules, input: String) -> String {
         .collect::<String>()
 }
 
+fn min_max_count_by_char(template: &str) -> (usize, usize) {
+    let mut elements = template.chars().collect_vec();
+    elements.sort_unstable();
+    let element_counts = elements
+        .iter()
+        .group_by(|&c| c)
+        .into_iter()
+        .map(|(&c, g)| (c, g.collect_vec().len()))
+        .collect::<HashMap<char, usize>>();
+    let (min, max) = element_counts
+        .iter()
+        .minmax_by_key(|&(_, count)| count)
+        .into_option()
+        .unwrap();
+    (*min.1, *max.1)
+}
+
 fn do_main(input: &str) {
     let mut input = read_lines_from_file(input);
     let mut template = input.next().unwrap();
@@ -33,20 +50,8 @@ fn do_main(input: &str) {
     for _round in 0..10 {
         template = substitute(&rules, template);
     }
-    let mut elements = template.chars().collect_vec();
-    elements.sort_unstable();
-    let element_counts = elements
-        .iter()
-        .group_by(|&c| c)
-        .into_iter()
-        .map(|(&c, g)| (c, g.collect_vec().len()))
-        .collect::<HashMap<char, usize>>();
-    let (min, max) = element_counts
-        .iter()
-        .minmax_by_key(|&(_, count)| count)
-        .into_option()
-        .unwrap();
-    let part1 = max.1 - min.1;
+    let (min, max) = min_max_count_by_char(&template);
+    let part1 = max - min;
     dbg!(part1);
 }
 
