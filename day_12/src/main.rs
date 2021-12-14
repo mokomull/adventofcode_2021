@@ -5,7 +5,7 @@ type Graph = HashMap<String, Vec<String>>;
 fn count_paths_from_node_to_end(
     graph: &Graph,
     node: &str,
-    visited: &HashSet<String>,
+    visited: &HashSet<&str>,
     visited_twice: Option<&str>,
 ) -> u64 {
     if node == "end" {
@@ -28,7 +28,7 @@ fn count_paths_from_node_to_end(
                 (true, Some(_)) => continue,
                 (false, vt) => {
                     let mut visited = visited.clone();
-                    visited.insert(node.to_owned());
+                    visited.insert(node);
                     res += count_paths_from_node_to_end(graph, next, &visited, vt);
                 }
             }
