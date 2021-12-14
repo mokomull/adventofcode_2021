@@ -53,6 +53,13 @@ fn do_main(input: &str) {
     let (min, max) = min_max_count_by_char(&template);
     let part1 = max - min;
     dbg!(part1);
+
+    for _round in 10..40 {
+        template = substitute(&rules, template);
+    }
+    let (min, max) = min_max_count_by_char(&template);
+    let part2 = max - min;
+    dbg!(part2);
 }
 
 fn main() {
