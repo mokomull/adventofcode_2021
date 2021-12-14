@@ -56,11 +56,21 @@ fn do_main(input: &str) {
         Some("don't let anything else visit twice"),
     );
     dbg!(part1);
+    assert_eq!(part1, 3708);
 
     let part2 = count_paths_from_node_to_end(&edges, "start", &Default::default(), None);
     dbg!(part2);
+    assert_eq!(part2, 93858);
 }
 
 fn main() {
     do_main("inputs/day_12.txt");
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn main() {
+        super::do_main("../inputs/day_12.txt");
+    }
 }
