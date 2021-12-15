@@ -38,6 +38,30 @@ fn do_main(input: &str) {
 
     let part1 = top_left_to_bottom_right_cost(&input);
     dbg!(part1);
+
+    let mut extended = input.clone();
+    for n in 1..5 {
+        for (i, row) in extended.iter_mut().enumerate() {
+            for &val in &input[i] {
+                row.push(if val + n < 10 { val + n } else { val + n - 9 })
+            }
+        }
+    }
+    for n in 1..5 {
+        for i in 0..input.len() {
+            let mut new_row = extended[i].clone();
+            for val in new_row.iter_mut() {
+                *val += n;
+                if *val > 9 {
+                    *val -= 9;
+                }
+            }
+            extended.push(new_row);
+        }
+    }
+    // dbg!(&extended);
+    let part2 = top_left_to_bottom_right_cost(&extended);
+    dbg!(part2);
 }
 
 fn main() {
