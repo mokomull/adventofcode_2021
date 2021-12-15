@@ -1,10 +1,6 @@
 use prelude::*;
 
-fn do_main(input: &str) {
-    let input = read_lines_from_file(input)
-        .map(|line| line.bytes().map(|c| c - b'0').collect_vec())
-        .collect_vec();
-
+fn top_left_to_bottom_right_cost(input: &[Vec<u8>]) -> u64 {
     let mut costs = vec![vec![u64::MAX; input[0].len()]; input.len()];
     let mut to_visit = vec![(0, 0, 0)];
 
@@ -32,7 +28,15 @@ fn do_main(input: &str) {
         }
     }
 
-    let part1 = costs[input.len() - 1][input[0].len() - 1];
+    costs[input.len() - 1][input[0].len() - 1]
+}
+
+fn do_main(input: &str) {
+    let input = read_lines_from_file(input)
+        .map(|line| line.bytes().map(|c| c - b'0').collect_vec())
+        .collect_vec();
+
+    let part1 = top_left_to_bottom_right_cost(&input);
     dbg!(part1);
 }
 
