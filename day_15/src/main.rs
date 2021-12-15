@@ -1,17 +1,25 @@
 use prelude::*;
 
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
+
 fn top_left_to_bottom_right_cost(input: &[Vec<u8>]) -> u64 {
     let mut costs = vec![vec![u64::MAX; input[0].len()]; input.len()];
-    let mut to_visit = vec![(0, 0, 0)];
+    let mut to_visit: BinaryHeap<Reverse<(u64, usize, usize)>> = BinaryHeap::new();
+
+    to_visit.push(Reverse((0, 0, 0)));
 
     while !to_visit.is_empty() {
-        let (i, j, cost) = to_visit.pop().unwrap();
+        let Reverse((cost, i, j)) = to_visit.pop().unwrap();
 
         if cost < costs[i][j] {
             // dbg!((i, j, cost));
             costs[i][j] = cost;
 
-            let mut add_one = |x, y| to_visit.push((x, y, cost + input[x][y] as u64));
+            let mut add_one = |x, y| {
+                let row: &Vec<u8> = &input[x]; // because apparently input[x][y] is no longer able to be type-inferred
+                to_visit.push(Reverse((cost + (row[y] as u64), x, y)))
+            };
 
             if i > 0 {
                 add_one(i - 1, j);
