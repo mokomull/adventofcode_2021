@@ -85,14 +85,35 @@ mod tests {
 
     #[test]
     fn parse_operator_0() {
-        let input = b"38006F45291200".view_bits();
+        let input = b"\x38\x00\x6F\x45\x29\x12\x00".view_bits();
         let (packet, remaining) = parse_packet(input);
 
         assert_eq!(
             packet,
-            (Packet::Operator(1, 6, vec![Packet::Literal(6, 10), Packet::Literal(2, 20),]))
+            Packet::Operator(1, 6, vec![Packet::Literal(6, 10), Packet::Literal(2, 20)])
         );
         assert_eq!(remaining.len(), 7);
+        assert_eq!(remaining.load_be::<u64>(), 0);
+    }
+
+    #[test]
+    fn parse_operator_1() {
+        let input = b"\xEE\x00\xD4\x0C\x82\x30\x60".view_bits();
+        let (packet, remaining) = parse_packet(input);
+
+        assert_eq!(
+            packet,
+            Packet::Operator(
+                7,
+                3,
+                vec![
+                    Packet::Literal(2, 1),
+                    Packet::Literal(4, 2),
+                    Packet::Literal(1, 3),
+                ]
+            )
+        );
+        assert_eq!(remaining.len(), 5);
         assert_eq!(remaining.load_be::<u64>(), 0);
     }
 }
