@@ -69,6 +69,40 @@ fn sum_packet_versions(packet: &Packet) -> u64 {
     }
 }
 
+fn packet_value(packet: &Packet) -> u64 {
+    match packet {
+        Packet::Literal(_, value) => *value,
+        Packet::Operator(_, packet_type, payload) => match packet_type {
+            0 => payload.iter().map(packet_value).sum(),
+            1 => payload.iter().map(packet_value).product(),
+            2 => payload.iter().map(packet_value).min().unwrap(),
+            3 => payload.iter().map(packet_value).max().unwrap(),
+            5 => {
+                if packet_value(&payload[0]) > packet_value(&payload[1]) {
+                    1
+                } else {
+                    0
+                }
+            }
+            6 => {
+                if packet_value(&payload[0]) < packet_value(&payload[1]) {
+                    1
+                } else {
+                    0
+                }
+            }
+            7 => {
+                if packet_value(&payload[0]) == packet_value(&payload[1]) {
+                    1
+                } else {
+                    0
+                }
+            }
+            x => panic!("unexpected packet type {}", x),
+        },
+    }
+}
+
 fn do_main(input: &str) {
     let input = hex::decode(read_lines_from_file(input).next().unwrap().as_bytes()).unwrap();
     let input = input.view_bits::<Msb0>();
@@ -78,6 +112,9 @@ fn do_main(input: &str) {
     assert_eq!(padding.load_be::<usize>(), 0);
     let part1 = sum_packet_versions(&packets);
     dbg!(part1);
+
+    let part2 = packet_value(&packets);
+    dbg!(part2);
 }
 
 fn main() {
