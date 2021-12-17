@@ -60,9 +60,24 @@ fn parse_packet(data: &BitSlice<Msb0, u8>) -> (Packet, &BitSlice<Msb0, u8>) {
     }
 }
 
+fn sum_packet_versions(packet: &Packet) -> u64 {
+    match packet {
+        Packet::Literal(version, _) => *version as u64,
+        Packet::Operator(version, _, payload) => {
+            *version as u64 + payload.iter().map(sum_packet_versions).sum::<u64>()
+        }
+    }
+}
+
 fn do_main(input: &str) {
     let input = hex::decode(read_lines_from_file(input).next().unwrap().as_bytes()).unwrap();
     let input = input.view_bits::<Msb0>();
+    let (packets, padding) = parse_packet(input);
+
+    // I assume that the input is one packet that wraps everything else, so
+    assert_eq!(padding.load_be::<usize>(), 0);
+    let part1 = sum_packet_versions(&packets);
+    dbg!(part1);
 }
 
 fn main() {
