@@ -5,7 +5,7 @@ use bitvec::prelude::*;
 #[derive(Debug, Eq, PartialEq)]
 enum Packet {
     Literal(u8, u64),
-    Operator(u8, Vec<Packet>),
+    Operator(u8, u8, Vec<Packet>),
 }
 
 fn parse_packet(data: &BitSlice<Msb0, u8>) -> (Packet, &BitSlice<Msb0, u8>) {
@@ -30,7 +30,33 @@ fn parse_packet(data: &BitSlice<Msb0, u8>) -> (Packet, &BitSlice<Msb0, u8>) {
             }
             (Packet::Literal(version, value), remaining)
         }
-        x => panic!("Unknown type {}", x),
+        packet_type => match data[6] {
+            false => {
+                let payload_bits = &data[7..7 + 15].load_be::<usize>();
+                let mut payload = &data[7 + 15..7 + 15 + payload_bits];
+                let mut packets = Vec::new();
+                while payload.len() > 0 {
+                    let (packet, rest) = parse_packet(payload);
+                    packets.push(packet);
+                    payload = rest;
+                }
+                (
+                    Packet::Operator(version, packet_type, packets),
+                    &data[7 + 15 + payload_bits..],
+                )
+            }
+            true => {
+                let payload_count = &data[7..7 + 11].load_be::<usize>();
+                let mut rest = &data[7 + 11..];
+                let mut packets = Vec::new();
+                for _ in 0..*payload_count {
+                    let (packet, leftover) = parse_packet(rest);
+                    packets.push(packet);
+                    rest = leftover;
+                }
+                (Packet::Operator(version, packet_type, packets), rest)
+            }
+        },
     }
 }
 
@@ -54,6 +80,19 @@ mod tests {
 
         assert_eq!(packet, (Packet::Literal(6, 2021)));
         assert_eq!(remaining.len(), 3);
+        assert_eq!(remaining.load_be::<u64>(), 0);
+    }
+
+    #[test]
+    fn parse_operator_0() {
+        let input = b"38006F45291200".view_bits();
+        let (packet, remaining) = parse_packet(input);
+
+        assert_eq!(
+            packet,
+            (Packet::Operator(1, 6, vec![Packet::Literal(6, 10), Packet::Literal(2, 20),]))
+        );
+        assert_eq!(remaining.len(), 7);
         assert_eq!(remaining.load_be::<u64>(), 0);
     }
 }
