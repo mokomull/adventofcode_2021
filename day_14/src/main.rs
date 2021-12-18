@@ -1,6 +1,6 @@
 use prelude::*;
 
-type Rules = HashMap<[char; 2], char>;
+type Rules = HashMap<[char; 2], String>;
 
 fn substitute(rules: &Rules, input: String) -> String {
     let to_insert = input
@@ -11,7 +11,7 @@ fn substitute(rules: &Rules, input: String) -> String {
 
     input
         .chars()
-        .map(Option::Some)
+        .map(|c| Option::Some([c].into_iter().collect::<String>()))
         .interleave(to_insert)
         .filter_map(std::convert::identity)
         .collect::<String>()
@@ -42,7 +42,7 @@ fn do_main(input: &str) {
     for line in input {
         let parts = line.split(" -> ").collect_vec();
         let from = parts[0].chars().collect_vec().try_into().unwrap();
-        let to = parts[1].chars().exactly_one().unwrap();
+        let to = parts[1].chars().collect();
 
         rules.insert(from, to);
     }
@@ -55,8 +55,13 @@ fn do_main(input: &str) {
     dbg!(part1);
 
     for _round in 10..40 {
-        template = substitute(&rules, template);
+        let snapshot = rules.clone();
+
+        for pair in snapshot.keys() {
+            *rules.get_mut(pair).unwrap() = substitute(&snapshot, pair.iter().collect());
+        }
     }
+    dbg!(rules);
     let (min, max) = min_max_count_by_char(&template);
     let part2 = max - min;
     dbg!(part2);
