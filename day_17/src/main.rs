@@ -13,9 +13,13 @@ fn highest_reached(
     let top_right = corners.iter().max().cloned().unwrap();
 
     let (mut x, mut y) = (0, 0);
-    let mut highest_y = 0;
+    let mut highest_y = i64::MIN;
 
     loop {
+        if y > highest_y {
+            highest_y = y
+        }
+
         if (bottom_left.0..=top_right.0).contains(&x) && (bottom_left.1..=top_right.1).contains(&y)
         {
             return Some(highest_y);
