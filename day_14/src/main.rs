@@ -3,6 +3,7 @@ use prelude::*;
 type Rules = HashMap<[char; 2], String>;
 
 fn substitute(rules: &Rules, input: String) -> String {
+    // dbg!((&input));
     let to_insert = input
         .chars()
         .tuple_windows()
@@ -54,13 +55,18 @@ fn do_main(input: &str) {
     let part1 = max - min;
     dbg!(part1);
 
-    for _round in 10..40 {
-        let snapshot = rules.clone();
+    let snapshot = rules.clone();
 
-        for pair in snapshot.keys() {
-            *rules.get_mut(pair).unwrap() = substitute(&snapshot, pair.iter().collect());
+    for pair in snapshot.keys() {
+        let mut result = pair.iter().collect();
+        for _round in 10..40 {
+            result = substitute(&snapshot, result);
         }
+        // after this point, rules contains the starting and ending character, so any particular
+        // rule can't *again* be used as a ruleset for substitute().
+        rules.insert(pair.clone(), result);
     }
+
     dbg!(rules);
     let (min, max) = min_max_count_by_char(&template);
     let part2 = max - min;
