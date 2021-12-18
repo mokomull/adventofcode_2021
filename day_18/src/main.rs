@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum Snailfish {
     Normal(u64),
@@ -13,9 +11,9 @@ impl Snailfish {
 
         // Visit the nodes in-order, keeping track of the previously seen regular number, because
         // that is what the left element explodes into.
-        let mut to_visit: VecDeque<_> = [(self, 0)].into();
+        let mut to_visit = vec![(self, 0)];
         while !to_visit.is_empty() {
-            let (this, depth) = to_visit.pop_front().unwrap();
+            let (this, depth) = to_visit.pop().unwrap();
 
             match this {
                 // if add_to_right has been set, then we have found an exploding snailfish number.
@@ -49,8 +47,8 @@ impl Snailfish {
                 }
 
                 Snailfish::Pair(ref mut a, ref mut b) => {
-                    to_visit.push_back((a, depth + 1));
-                    to_visit.push_back((b, depth + 1));
+                    to_visit.push((b, depth + 1));
+                    to_visit.push((a, depth + 1));
                 }
             }
         }
