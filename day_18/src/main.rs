@@ -82,6 +82,19 @@ impl Snailfish {
     }
 }
 
+impl std::ops::Add for Snailfish {
+    type Output = Snailfish;
+
+    fn add(mut self, mut rhs: Snailfish) -> Snailfish {
+        self.reduce();
+        rhs.reduce();
+
+        let mut result = Snailfish::Pair(Box::new(self), Box::new(rhs));
+        result.reduce();
+        result
+    }
+}
+
 fn parse_snailfish(input: &[u8]) -> IResult<&[u8], Snailfish> {
     fn pair(input: &[u8]) -> IResult<&[u8], Snailfish> {
         let (input, _) = tag(b"[")(input)?;
@@ -181,12 +194,24 @@ mod test {
             b"[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]",
             b"[[[[0,7],4],[[7,8],[6,0]]],[8,1]]",
         );
-        test_reduce_parsed(
-            b"[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
+    }
+
+    #[test]
+    fn add() {
+        fn test_add(lhs: &[u8], rhs: &[u8], output: &[u8]) {
+            let lhs = parse_snailfish(lhs).unwrap().1;
+            let rhs = parse_snailfish(rhs).unwrap().1;
+            assert_eq!(lhs + rhs, parse_snailfish(output).unwrap().1);
+        }
+
+        test_add(
+            b"[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]",
+            b"[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]",
             b"[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]",
         );
-        test_reduce_parsed(
-            b"[[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]],[1,[[[9,3],9],[[9,0],[0,7]]]]]",
+        test_add(
+            b"[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]",
+            b"[1,[[[9,3],9],[[9,0],[0,7]]]]",
             b"[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]",
         );
     }
