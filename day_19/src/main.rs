@@ -10,7 +10,8 @@ use Axis::*;
 
 #[derive(Clone, Copy, Debug)]
 enum Transform {
-    Flip(Axis),
+    Pos(Axis),
+    Neg(Axis),
     RotateCCW(u8),
 }
 use Transform::*;
@@ -18,23 +19,26 @@ use Transform::*;
 impl Transform {
     fn transform(&self, coords: [i32; 3]) -> [i32; 3] {
         match self {
-            Flip(axis) => {
-                let mut output = coords;
-                match axis {
-                    X => output[0] *= -1,
-                    Y => output[1] *= -1,
-                    Z => output[2] *= -1,
-                }
-                output
-            }
+            // Transform needed to get scanner's "facing" axis rotated to +X.
+            Pos(axis) => match axis {
+                X => coords,
+                Y => [coords[1], -coords[0], coords[2]],
+                Z => [coords[2], coords[1], -coords[0]],
+            },
+            Neg(axis) => match axis {
+                X => [-coords[0], -coords[1], coords[2]],
+                Y => [-coords[1], coords[0], coords[2]],
+                Z => [coords[2], coords[1], -coords[0]],
+            },
             RotateCCW(count) => {
-                // rotate about the Z axis (i.e. in the XY plane)
+                // rotate about the X axis (i.e. in the YZ plane) because I've defined "facing
+                // positive X" to be the identity transform.
                 let mut output = coords;
                 for _ in 0..*count {
-                    // multiply [x       [0  -1  0
-                    //           y   by   1   0  0
-                    //           z]       0   0  1]
-                    output = [output[1], -output[0], output[2]];
+                    // multiply  [1   0  0       [x
+                    //            0   0  1   by   y
+                    //            0  -1  0]       z]
+                    output = [output[0], output[2], -output[1]]
                 }
                 output
             }
@@ -86,12 +90,10 @@ fn do_main(input: &str) {
     let mut locations = vec![(vec![], [0, 0, 0])];
 
     'scanner: for scanner in &scanners[1..] {
-        // try every possible axis flip
-        for flips in [Flip(X), Flip(Y), Flip(Z)].into_iter().powerset() {
+        // try every possible facing direction and "up" direction
+        for orientation in [Pos(X), Pos(Y), Pos(Z), Neg(X), Neg(Y), Neg(Z)] {
             for rotations in [0, 1, 2, 3] {
-                let mut transforms = flips.clone();
-                transforms.push(RotateCCW(rotations));
-                let transforms = transforms;
+                let transforms = vec![orientation, RotateCCW(rotations)];
 
                 // now let's pick all pairs of points between scanner 0 and this one, pretend
                 // they're the same beacon, and see if the offset makes sense (i.e. at least 12
