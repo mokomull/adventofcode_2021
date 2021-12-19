@@ -1,3 +1,5 @@
+use nom::{branch::alt, bytes::complete::tag, character::complete::digit1, IResult};
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum Snailfish {
     Normal(u64),
@@ -59,13 +61,33 @@ impl Snailfish {
     }
 }
 
+fn parse_snailfish(input: &[u8]) -> IResult<&[u8], Snailfish> {
+    fn pair(input: &[u8]) -> IResult<&[u8], Snailfish> {
+        let (input, _) = tag(b"[")(input)?;
+        let (input, left) = parse_snailfish(input)?;
+        let (input, _) = tag(b",")(input)?;
+        let (input, right) = parse_snailfish(input)?;
+        let (input, _) = tag(b"]")(input)?;
+        Ok((input, Snailfish::Pair(Box::new(left), Box::new(right))))
+    }
+    fn integer(input: &[u8]) -> IResult<&[u8], Snailfish> {
+        let (input, value) = digit1(input)?;
+        Ok((
+            input,
+            Snailfish::Normal(std::str::from_utf8(value).unwrap().parse().unwrap()),
+        ))
+    }
+
+    alt((pair, integer))(input)
+}
+
 fn main() {
     println!("Hello, world!");
 }
 
 #[cfg(test)]
 mod test {
-    use crate::Snailfish;
+    use super::*;
 
     #[test]
     fn explode() {
@@ -88,6 +110,23 @@ mod test {
                 bx(P(bx(P(bx(P(bx(N(0)), bx(N(9)))), bx(N(2)))), bx(N(3)))),
                 bx(N(4))
             )
+        );
+
+        fn test_explode_parsed(input: &[u8], output: &[u8]) {
+            let mut testcase = parse_snailfish(input).unwrap().1;
+            assert!(testcase.exploded());
+            assert_eq!(testcase, parse_snailfish(output).unwrap().1);
+        }
+
+        test_explode_parsed(b"[7,[6,[5,[4,[3,2]]]]]", b"[7,[6,[5,[7,0]]]]");
+        test_explode_parsed(b"[[6,[5,[4,[3,2]]]],1]", b"[[6,[5,[7,0]]],3]");
+        test_explode_parsed(
+            b"[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]",
+            b"[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
+        );
+        test_explode_parsed(
+            b"[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
+            b"[[3,[2,[8,0]]],[9,[5,[7,0]]]]",
         );
     }
 }
