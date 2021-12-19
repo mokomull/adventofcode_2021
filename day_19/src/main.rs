@@ -148,6 +148,23 @@ fn do_main(input: &str) {
     }
     // double-check that we did indeed find an orientation/offset for each scanner
     assert_eq!(locations.len(), scanners.len());
+
+    let mut beacons = HashSet::new();
+    for (id, scanner) in scanners.iter().enumerate() {
+        for point in scanner {
+            let mut translated = *point;
+            let mut translate_id = id;
+            // translate the point to the reference scanner, until we reach 0
+            while translate_id != 0 {
+                let (next_id, transform, offset) = locations.get(&translate_id).unwrap();
+                translated = Transform::apply_offset(transform, translated, *offset);
+            }
+            beacons.insert(translated);
+        }
+    }
+
+    let part1 = beacons.len();
+    dbg!(part1);
 }
 
 fn main() {
