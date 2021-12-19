@@ -180,6 +180,28 @@ fn do_main(input: &str) {
 
     let part1 = beacons.len();
     dbg!(part1);
+
+    let part2 = (0..scanners.len())
+        .map(|scanner_id| {
+            // find the scanner's origin, translated to the scanner 0 reference frame
+            let mut translated = [0, 0, 0];
+            let mut current_reference_id = scanner_id;
+            while current_reference_id != 0 {
+                let next_id = predecessors[&current_reference_id];
+                let (transform, offset) = locations.get(&(current_reference_id, next_id)).unwrap();
+                translated = Transform::apply_offset(transform, translated, *offset);
+                current_reference_id = next_id;
+            }
+            translated
+        })
+        .tuple_combinations()
+        .map(|(this, that)| {
+            // calculate the Manhattan distance
+            (this[0] - that[0]).abs() + (this[1] - that[1]).abs() + (this[2] - that[2]).abs()
+        })
+        .max()
+        .unwrap();
+    dbg!(part2);
 }
 
 fn main() {
