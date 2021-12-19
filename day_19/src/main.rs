@@ -93,9 +93,10 @@ fn do_main(input: &str) {
     let mut locations: HashMap<usize, (usize, Vec<Transform>, [i32; 3])> =
         [(0, (0, vec![], [0, 0, 0]))].into();
 
-    'scanner: for ((origin_id, origin), (this_id, this_scanner)) in
-        scanners.iter().enumerate().tuple_combinations()
-    {
+    'scanner: for permutation in scanners.iter().enumerate().permutations(2) {
+        let (origin_id, origin) = permutation[0];
+        let (this_id, this_scanner) = permutation[1];
+
         if locations.contains_key(&this_id) {
             continue;
         }
