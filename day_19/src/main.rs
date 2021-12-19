@@ -28,7 +28,7 @@ impl Transform {
             Neg(axis) => match axis {
                 X => [-coords[0], -coords[1], coords[2]],
                 Y => [-coords[1], coords[0], coords[2]],
-                Z => [coords[2], coords[1], -coords[0]],
+                Z => [-coords[2], coords[1], coords[0]],
             },
             RotateCCW(count) => {
                 // rotate about the X axis (i.e. in the YZ plane) because I've defined "facing
