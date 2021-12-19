@@ -1,4 +1,5 @@
 use nom::{branch::alt, bytes::complete::tag, character::complete::digit1, IResult};
+use prelude::{read_lines_from_file, Itertools};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum Snailfish {
@@ -125,8 +126,21 @@ fn parse_snailfish(input: &[u8]) -> IResult<&[u8], Snailfish> {
     alt((pair, integer))(input)
 }
 
+fn do_main(input: &str) {
+    let input = read_lines_from_file(input)
+        .map(|line| parse_snailfish(line.as_bytes()).unwrap().1)
+        .collect_vec();
+
+    let part1 = input
+        .into_iter()
+        .reduce(|accum, this| accum + this)
+        .unwrap()
+        .magnitude();
+    dbg!(part1);
+}
+
 fn main() {
-    println!("Hello, world!");
+    do_main("inputs/day_18.txt");
 }
 
 #[cfg(test)]
