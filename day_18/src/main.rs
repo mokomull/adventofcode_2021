@@ -29,7 +29,10 @@ impl Snailfish {
                     left = Some(this);
                 }
 
-                Snailfish::Pair(a, b) if depth >= 4 => {
+                // explode a pair that is beyond depth 4, but if an explosion has already occurred,
+                // we simply want to fall through into the next case to visit the next regular
+                // number.
+                Snailfish::Pair(a, b) if depth >= 4 && add_to_right.is_none() => {
                     // the flavortext says that exploding pairs will only have regular numbers as
                     // children.
                     if let Snailfish::Normal(a) = **a {
@@ -161,6 +164,17 @@ mod test {
         test_explode_parsed(
             b"[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
             b"[[3,[2,[8,0]]],[9,[5,[7,0]]]]",
+        );
+
+        // from manually evaluating [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]] +
+        // [7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
+        test_explode_parsed(
+            b"[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
+            b"[[[[4,0],[5,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
+        );
+        test_explode_parsed(
+            b"[[[[4,0],[5,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
+            b"[[[[4,0],[5,4]],[[0,[7,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
         );
     }
 
