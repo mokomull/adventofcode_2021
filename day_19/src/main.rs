@@ -87,38 +87,48 @@ fn do_main(input: &str) {
     }
 
     // define scanner 0 to be centered at 0, 0, 0, and right-side-up.
-    let mut locations = vec![(vec![], [0, 0, 0])];
 
-    'scanner: for scanner in &scanners[1..] {
+    // Maps scanner id -> (previous scanner id, transform to get from previous to this one, offset
+    // to get from previous to this one)
+    let mut locations: HashMap<usize, (usize, Vec<Transform>, [i32; 3])> =
+        [(0, (0, vec![], [0, 0, 0]))].into();
+
+    'scanner: for ((origin_id, origin), (this_id, this_scanner)) in
+        scanners.iter().enumerate().tuple_combinations()
+    {
+        if locations.contains_key(&this_id) {
+            continue;
+        }
+
         // try every possible facing direction and "up" direction
         for orientation in [Pos(X), Pos(Y), Pos(Z), Neg(X), Neg(Y), Neg(Z)] {
             for rotations in [0, 1, 2, 3] {
                 let transforms = vec![orientation, RotateCCW(rotations)];
 
-                // now let's pick all pairs of points between scanner 0 and this one, pretend
-                // they're the same beacon, and see if the offset makes sense (i.e. at least 12
-                // beacons translated from scanner-n coordinates to the scanner-0-relative
+                // now let's pick all pairs of points between the origin scanner and this one,
+                // pretend they're the same beacon, and see if the offset makes sense (i.e. at least
+                // 12 beacons translated from scanner-n coordinates to the scanner-0-relative
                 // coordinate system match)
-                for canonical in &scanners[0] {
-                    for this in scanner {
-                        let rotated = Transform::apply(&transforms, *this);
+                for origin_point in origin {
+                    for this_point in this_scanner {
+                        let rotated = Transform::apply(&transforms, *this_point);
                         let offset = [
-                            canonical[0] - rotated[0],
-                            canonical[1] - rotated[1],
-                            canonical[2] - rotated[2],
+                            origin_point[0] - rotated[0],
+                            origin_point[1] - rotated[1],
+                            origin_point[2] - rotated[2],
                         ];
                         // if I've done the math right this will be a no-op, but make sure that
                         // applying transforms and then offset to this point really does get us the
                         // canonical coordinate system.
                         assert_eq!(
-                            Transform::apply_offset(&transforms, *this, offset),
-                            *canonical
+                            Transform::apply_offset(&transforms, *this_point, offset),
+                            *origin_point
                         );
 
-                        let matching_beacons = scanner
+                        let matching_beacons = this_scanner
                             .iter()
                             .filter(|&beacon| {
-                                scanners[0].contains(&Transform::apply_offset(
+                                origin.contains(&Transform::apply_offset(
                                     &transforms,
                                     *beacon,
                                     offset,
@@ -127,7 +137,7 @@ fn do_main(input: &str) {
                             .count();
 
                         if matching_beacons >= 12 {
-                            locations.push((transforms, offset));
+                            locations.insert(this_id, (origin_id, transforms, offset));
                             continue 'scanner;
                         }
                     }
