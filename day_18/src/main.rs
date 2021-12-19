@@ -83,6 +83,13 @@ impl Snailfish {
     fn reduce(&mut self) {
         while self.exploded() || self.split() {}
     }
+
+    fn magnitude(&self) -> u64 {
+        match self {
+            Snailfish::Normal(value) => *value,
+            Snailfish::Pair(lhs, rhs) => 3 * lhs.magnitude() + 2 * rhs.magnitude(),
+        }
+    }
 }
 
 impl std::ops::Add for Snailfish {
@@ -227,6 +234,23 @@ mod test {
             b"[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]",
             b"[1,[[[9,3],9],[[9,0],[0,7]]]]",
             b"[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]",
+        );
+    }
+
+    #[test]
+    fn magnitude() {
+        fn test_magnitude(input: &[u8], output: u64) {
+            assert_eq!(parse_snailfish(input).unwrap().1.magnitude(), output);
+        }
+
+        test_magnitude(b"[[1,2],[[3,4],5]]", 143);
+        test_magnitude(b"[[[[0,7],4],[[7,8],[6,0]]],[8,1]]", 1384);
+        test_magnitude(b"[[[[1,1],[2,2]],[3,3]],[4,4]]", 445);
+        test_magnitude(b"[[[[3,0],[5,3]],[4,4]],[5,5]]", 791);
+        test_magnitude(b"[[[[5,0],[7,4]],[5,5]],[6,6]]", 1137);
+        test_magnitude(
+            b"[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]",
+            3488,
         );
     }
 }
