@@ -65,6 +65,13 @@ fn do_main(input: &str) {
         }
     }
     dbg!(part1);
+
+    let part2 = (-1000..1000)
+        .map(|xvel| (-1000..1000).map(move |yvel| highest_reached(xvel, yvel, x1, x2, y1, y2)))
+        .flatten()
+        .filter(|&v| v.is_some())
+        .count();
+    dbg!(part2);
 }
 
 fn main() {
