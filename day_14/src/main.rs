@@ -83,29 +83,58 @@ mod test {
     #[test]
     fn substitution() {
         let rules = [
-            (['C', 'H'], 'B'),
-            (['H', 'H'], 'N'),
-            (['C', 'B'], 'H'),
-            (['N', 'H'], 'C'),
-            (['H', 'B'], 'C'),
-            (['H', 'C'], 'B'),
-            (['H', 'N'], 'C'),
-            (['N', 'N'], 'C'),
-            (['B', 'H'], 'H'),
-            (['N', 'C'], 'B'),
-            (['N', 'B'], 'B'),
-            (['B', 'N'], 'B'),
-            (['B', 'B'], 'N'),
-            (['B', 'C'], 'B'),
-            (['C', 'C'], 'N'),
-            (['C', 'N'], 'C'),
+            ([b'C', b'H'], [[b'C', b'B'], [b'B', b'H']]),
+            ([b'H', b'H'], [[b'H', b'N'], [b'N', b'H']]),
+            ([b'C', b'B'], [[b'C', b'H'], [b'H', b'B']]),
+            ([b'N', b'H'], [[b'N', b'C'], [b'C', b'H']]),
+            ([b'H', b'B'], [[b'H', b'C'], [b'C', b'B']]),
+            ([b'H', b'C'], [[b'H', b'B'], [b'B', b'C']]),
+            ([b'H', b'N'], [[b'H', b'C'], [b'C', b'N']]),
+            ([b'N', b'N'], [[b'N', b'C'], [b'C', b'N']]),
+            ([b'B', b'H'], [[b'B', b'H'], [b'H', b'H']]),
+            ([b'N', b'C'], [[b'N', b'B'], [b'B', b'C']]),
+            ([b'N', b'B'], [[b'N', b'B'], [b'B', b'B']]),
+            ([b'B', b'N'], [[b'B', b'B'], [b'B', b'N']]),
+            ([b'B', b'B'], [[b'B', b'N'], [b'N', b'B']]),
+            ([b'B', b'C'], [[b'B', b'B'], [b'B', b'C']]),
+            ([b'C', b'C'], [[b'C', b'N'], [b'N', b'C']]),
+            ([b'C', b'N'], [[b'C', b'C'], [b'C', b'N']]),
         ]
         .into();
 
-        let mut polymer = "NNCB".to_owned();
+        // NNCB
+        let mut polymer = [([b'N', b'N'], 1), ([b'N', b'C'], 1), ([b'C', b'B'], 1)].into();
         polymer = substitute(&rules, polymer);
-        assert_eq!(polymer, "NCNBCHB");
+        // zeroes are left in as a benign implementation detail, but remove them before comparing
+        // for testing
+        polymer.retain(|_, &mut count| count != 0);
+        assert_eq!(
+            polymer,
+            crate::Count::from([
+                // NCNBCHB
+                ([b'N', b'C'], 1),
+                ([b'C', b'N'], 1),
+                ([b'N', b'B'], 1),
+                ([b'B', b'C'], 1),
+                ([b'C', b'H'], 1),
+                ([b'H', b'B'], 1),
+            ])
+        );
         polymer = substitute(&rules, polymer);
-        debug_assert_eq!(polymer, "NBCCNBBBCBHCB");
+        polymer.retain(|_, &mut count| count != 0);
+        debug_assert_eq!(
+            polymer,
+            crate::Count::from([
+                // NBCCNBBBCBHCB, split into pairs and piped through sort|uniq -c
+                ([b'B', b'B'], 2),
+                ([b'B', b'C'], 2),
+                ([b'B', b'H'], 1),
+                ([b'C', b'B'], 2),
+                ([b'C', b'C'], 1),
+                ([b'C', b'N'], 1),
+                ([b'H', b'C'], 1),
+                ([b'N', b'B'], 2),
+            ])
+        );
     }
 }
