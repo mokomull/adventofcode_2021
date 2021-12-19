@@ -76,6 +76,10 @@ impl Snailfish {
             Snailfish::Pair(a, b) => a.split() || b.split(),
         }
     }
+
+    fn reduce(&mut self) {
+        while self.exploded() || self.split() {}
+    }
 }
 
 fn parse_snailfish(input: &[u8]) -> IResult<&[u8], Snailfish> {
@@ -162,6 +166,28 @@ mod test {
         test_split_parsed(
             b"[[[[0,7],4],[[7,8],[0,13]]],[1,1]]",
             b"[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]",
+        );
+    }
+
+    #[test]
+    fn reduce() {
+        fn test_reduce_parsed(input: &[u8], output: &[u8]) {
+            let mut testcase = parse_snailfish(input).unwrap().1;
+            testcase.reduce();
+            assert_eq!(testcase, parse_snailfish(output).unwrap().1);
+        }
+
+        test_reduce_parsed(
+            b"[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]",
+            b"[[[[0,7],4],[[7,8],[6,0]]],[8,1]]",
+        );
+        test_reduce_parsed(
+            b"[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
+            b"[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]",
+        );
+        test_reduce_parsed(
+            b"[[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]],[1,[[[9,3],9],[[9,0],[0,7]]]]]",
+            b"[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]",
         );
     }
 }
