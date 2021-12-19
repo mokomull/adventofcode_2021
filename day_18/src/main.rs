@@ -132,11 +132,20 @@ fn do_main(input: &str) {
         .collect_vec();
 
     let part1 = input
-        .into_iter()
+        .iter()
+        .cloned()
         .reduce(|accum, this| accum + this)
         .unwrap()
         .magnitude();
     dbg!(part1);
+
+    let part2 = input
+        .iter()
+        .tuple_combinations()
+        .map(|(lhs, rhs)| (lhs.clone() + rhs.clone()).magnitude())
+        .max()
+        .unwrap();
+    dbg!(part2);
 }
 
 fn main() {
