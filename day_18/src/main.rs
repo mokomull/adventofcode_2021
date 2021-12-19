@@ -59,6 +59,23 @@ impl Snailfish {
         // sentinel.
         add_to_right.is_some()
     }
+
+    fn split(&mut self) -> bool {
+        match self {
+            Snailfish::Normal(value) if *value >= 10 => {
+                *self = Snailfish::Pair(
+                    Box::new(Snailfish::Normal(*value / 2)),
+                    Box::new(Snailfish::Normal((*value + 1) / 2)),
+                );
+                true
+            }
+
+            Snailfish::Normal(_) => false,
+
+            // take advantage of short-circuiting to split only the first thing that splits
+            Snailfish::Pair(a, b) => a.split() || b.split(),
+        }
+    }
 }
 
 fn parse_snailfish(input: &[u8]) -> IResult<&[u8], Snailfish> {
@@ -127,6 +144,24 @@ mod test {
         test_explode_parsed(
             b"[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
             b"[[3,[2,[8,0]]],[9,[5,[7,0]]]]",
+        );
+    }
+
+    #[test]
+    fn split() {
+        fn test_split_parsed(input: &[u8], output: &[u8]) {
+            let mut testcase = parse_snailfish(input).unwrap().1;
+            assert!(testcase.split());
+            assert_eq!(testcase, parse_snailfish(output).unwrap().1);
+        }
+
+        test_split_parsed(
+            b"[[[[0,7],4],[15,[0,13]]],[1,1]]",
+            b"[[[[0,7],4],[[7,8],[0,13]]],[1,1]]",
+        );
+        test_split_parsed(
+            b"[[[[0,7],4],[[7,8],[0,13]]],[1,1]]",
+            b"[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]",
         );
     }
 }
