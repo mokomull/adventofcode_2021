@@ -96,9 +96,17 @@ fn do_main(input: &str) {
     for _ in 0..2 {
         image = enhance(&image, &algorithm);
     }
-    if let DefaultDark(lit) = image {
+    if let DefaultDark(lit) = &image {
         let part1 = lit.len();
         dbg!(part1);
+    }
+
+    for _ in 2..50 {
+        image = enhance(&image, &algorithm);
+    }
+    if let DefaultDark(lit) = &image {
+        let part2 = lit.len();
+        dbg!(part2);
     }
 }
 
