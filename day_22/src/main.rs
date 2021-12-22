@@ -57,6 +57,27 @@ fn do_main(input: &str) {
 
     let part1 = cubes.len();
     dbg!(part1);
+
+    let mut cubes = HashSet::new();
+    for i in &input {
+        for x in i.1.clone() {
+            for y in i.2.clone() {
+                for z in i.3.clone() {
+                    match i.0 {
+                        On => {
+                            cubes.insert((x, y, z));
+                        }
+                        Off => {
+                            cubes.remove(&(x, y, z));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let part2 = cubes.len();
+    dbg!(part2);
 }
 
 fn main() {
