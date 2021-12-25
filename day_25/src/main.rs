@@ -1,6 +1,6 @@
 use prelude::*;
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum Cucumber {
     East,
     South,
@@ -53,7 +53,7 @@ fn do_main(input: &str) {
                     continue;
                 }
 
-                let nexti = (j + 1) % cucumbers.len();
+                let nexti = (i + 1) % cucumbers.len();
                 if cucumbers[nexti][j] == Empty {
                     moved += 1;
                     next_cucumbers[i][j] = Empty;
@@ -65,6 +65,7 @@ fn do_main(input: &str) {
 
         if moved == 0 {
             last_step = Some(step);
+            break;
         }
     }
 
